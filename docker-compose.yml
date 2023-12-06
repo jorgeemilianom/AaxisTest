@@ -1,0 +1,39 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    container_name: PostgreSQL
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - php7project
+  php:
+    build: ./docker/.
+    container_name: PHP74
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - php7project
+  phppgadmin:
+    image: dpage/pgadmin4
+    container_name: PHPPgAdmin
+    restart: always
+    ports:
+      - 3002:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=jorgeemilianom@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    networks:
+      - php7project
+    depends_on:
+      - db
+
+networks:
+  php7project:
+    name: php7project
+    driver: bridge
