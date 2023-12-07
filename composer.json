@@ -15,11 +15,12 @@
         "symfony/dotenv": "5.4.*",
         "symfony/flex": "^1.17|^2",
         "symfony/framework-bundle": "5.4.*",
+        "symfony/maker-bundle": "^1.43",
         "symfony/runtime": "5.4.*",
         "symfony/security-bundle": "5.4.*",
         "symfony/serializer": "5.4.*",
+        "symfony/twig-bundle": "5.4.*",
         "symfony/validator": "5.4.*",
-        "symfony/maker-bundle": "^1.43",
         "symfony/yaml": "5.4.*"
     },
     "autoload": {
@@ -58,5 +59,9 @@
             "allow-contrib": false,
             "require": "5.4.*"
         }
+    },
+    "require-dev": {
+        "symfony/debug-bundle": "5.4.*",
+        "symfony/web-profiler-bundle": "5.4.*"
     }
 }
