@@ -12,7 +12,13 @@ class Logger {
     }
 
     private static function registerLog($errorLog){
-        $file_errors = is_writable('../logs/errors.log') ? fopen(__DIR__  . '../logs/errors.log', 'a') : false;
+        $logsDirectory = __DIR__."/../../logs";
+        if (!file_exists($logsDirectory)) {
+            mkdir($logsDirectory, 0777, true); // Crea la carpeta con permisos de escritura
+        }
+
+        $file_errors =  fopen($logsDirectory .'/errors.log', 'w');
+
         if ($file_errors !== false) {
             fwrite($file_errors, $errorLog);
             fclose($file_errors);

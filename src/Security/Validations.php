@@ -10,8 +10,10 @@ class Validations
     public static function checkToken():? bool
     {
         try {
-            $bearearToken = apache_request_headers()['Authorization'];
-            $TokenArray = explode(" ", $bearearToken);
+            $bearearToken = apache_request_headers();
+            if(!isset($bearearToken['Authorization'])) throw new Exception("Do not provide a token");
+            
+            $TokenArray = explode(" ", $bearearToken['Authorization']);
 
             if (!isset($TokenArray[1]) || count($TokenArray) < 2) throw new Exception("There are inconsistencies in the token provided");
 
@@ -29,11 +31,11 @@ class Validations
              *    'user' => $user
              *];
              */
-
             $tokenExample = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-            if($authToken == $tokenExample) return true;
+            
+            if($authToken == $tokenExample) return false;
 
-            return false;
+            return true;
         } catch (Exception $e) {
             throw new Exception($e->getMessage(), 1, $e);
         }

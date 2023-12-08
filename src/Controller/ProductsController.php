@@ -21,7 +21,6 @@ class ProductsController extends AbstractBaseController
         try {
             if(Validations::checkToken()) return $this->responseTokenInvalid();
 
-            throw new Exception("Exception Test");
             $allProducts = $this->entityManager->getRepository(Products::class)->findAll();
             $allProducts = $allProducts ? $this->normalize($allProducts) : [];
             return new JsonResponse([
