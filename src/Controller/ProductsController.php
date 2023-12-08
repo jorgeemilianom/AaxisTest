@@ -19,13 +19,13 @@ class ProductsController extends AbstractBaseController
     public function getAll(): JsonResponse
     {
         try {
-            if(Validations::checkToken()) return $this->responseTokenInvalid();
+            if (Validations::checkToken()) return $this->responseTokenInvalid();
 
             $allProducts = $this->entityManager->getRepository(Products::class)->findAll();
             $allProducts = $allProducts ? $this->normalize($allProducts) : [];
             return new JsonResponse([
                 'message' => 'Products list',
-                'products' => $allProducts
+                'data' => $allProducts
             ], 200);
         } catch (\Exception $e) {
             return $this->ExceptionResponse($e);
@@ -38,13 +38,31 @@ class ProductsController extends AbstractBaseController
     public function createProduct(Request $request): JsonResponse
     {
         try {
-            if(Validations::checkToken()) return $this->responseTokenInvalid();
+            if (Validations::checkToken()) return $this->responseTokenInvalid();
 
             $parameters = $request->getContent();
             $products_array = json_decode($parameters, true);
 
+            # Basic Validations of Json
+            if (!is_array($products_array) || count($products_array) < 1) return new JsonResponse([
+                'message' => 'Data provided in incorrect format',
+                'data' => []
+            ], 400);
+
             $allProducts = [];
+            $Errors = [];
             foreach ($products_array as $productData) {
+
+                # We validate required values
+                $validate = !isset($productData['sku']);
+                $validate = !isset($productData['product_name']) || $validate;
+                $validate = !isset($productData['description']) || $validate;
+                if ($validate) {
+                    $Errors['message'] = "Incorrect data or format in the following products";
+                    $Errors['products'][] = $productData;
+                    continue;
+                }
+
                 $product = new Products();
                 $product->setSku($productData['sku']);
                 $product->setProductName($productData['product_name']);
@@ -58,7 +76,8 @@ class ProductsController extends AbstractBaseController
 
             return new JsonResponse([
                 'message' => 'Added products',
-                'data' => $allProducts
+                'data' => $allProducts,
+                'errors' => $Errors
             ], 201);
         } catch (\Exception $e) {
             return $this->ExceptionResponse($e);
@@ -71,16 +90,43 @@ class ProductsController extends AbstractBaseController
     public function updateProduct(Request $request): JsonResponse
     {
         try {
-            if(Validations::checkToken()) return $this->responseTokenInvalid();
-            
+            if (Validations::checkToken()) return $this->responseTokenInvalid();
+
             $parameters = $request->getContent();
             $products_array = json_decode($parameters, true);
 
+            # Basic Validations of Json
+            if (!is_array($products_array) || count($products_array) < 1) return new JsonResponse([
+                'message' => 'Data provided in incorrect format',
+                'data' => []
+            ], 400);
+
             $allProducts = [];
-            foreach ($products_array as $key => $productData) {
+            $Errors = [];
+            foreach ($products_array as $productData) {
+
+                # We validate required values
+                $validate = !isset($productData['sku']);
+                $validate = !isset($productData['product_name']) || $validate;
+                $validate = !isset($productData['description']) || $validate;
+                if ($validate) {
+                    $Errors['message'] = "Incorrect data or format in the following products";
+                    $Errors['products'][] = $productData;
+                    continue;
+                }
+
                 $product = $this->entityManager
                     ->getRepository(Products::class)
-                    ->findOneBy(['id' => $productData['id']]);
+                    ->findOneBy(['sku' => $productData['sku']]);
+                # If product is not found
+                if (!$product) {
+                    $Errors['message'] = "Incorrect data or format in the following products";
+                    $Errors['products'][] = [
+                        'info' => "Product not found",
+                        'data' => $productData
+                    ];
+                    continue;
+                }
                 $product->setSku($productData['sku']);
                 $product->setProductName($productData['product_name']);
                 $product->setDescription($productData['description']);
@@ -91,8 +137,9 @@ class ProductsController extends AbstractBaseController
             }
 
             return new JsonResponse([
-                'message' => 'Productos actualizados',
-                'data' => $allProducts
+                'message' => 'Updated products',
+                'data' => $allProducts,
+                'errors' => $Errors
             ], 201);
         } catch (\Exception $e) {
             return $this->ExceptionResponse($e);
