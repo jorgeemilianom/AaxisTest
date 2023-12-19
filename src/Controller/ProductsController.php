@@ -2,10 +2,9 @@
 
 namespace App\Controller;
 
-use AbstractBaseController;
+use App\Contracts\AbstractBaseController;
 use App\Entity\Products;
 use App\Security\Validations;
-use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;

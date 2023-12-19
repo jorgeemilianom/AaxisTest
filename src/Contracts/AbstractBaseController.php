@@ -1,7 +1,8 @@
 <?php
-
+namespace App\Contracts;
 use App\Services\Logger;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -28,13 +29,13 @@ abstract class AbstractBaseController extends AbstractController
         if (getenv('APP_ENV') != 'Prod') {
             return new JsonResponse([
                 'message'   => $exception->getMessage(),
-                'status' => false
+                'data' => []
             ], 500);
         }
 
         return new JsonResponse([
             'message'   => 'Server Error',
-            'status' => false
+            'data' => []
         ], 500);
     }
 
